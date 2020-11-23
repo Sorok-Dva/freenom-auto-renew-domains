@@ -89,9 +89,13 @@ const freenom = {
 
       let message = ``
       let i = 1
-      await domains.map(async domain => {
+      await Promise.all(domains.map(async domain => {
         const id = domain.renewLink.replace('https://my.freenom.com/domains.php?a=renewdomain&domain=', '')
         const daysLeft = parseInt(domain.expires.replace(' Days', ''))
+        // this condition may return false positive, due to lake of data on freenom,
+        // the false positive can occurs in the case where a free domain in renewable,
+        // that's why the scrapper should be run a first time without any free domains renewables
+        // (in this way the free domain state will be saved in db)
         const freeDomain = (daysLeft > 14 && domain.renewable === false)
         let row = await freenom.getDomain(domain.name)
 
@@ -103,10 +107,9 @@ const freenom = {
           row = await freenom.getDomain(domain.name)
         }
 
-        message += `- **${domain.name}** _(${freeDomain ? 'free' : 'paid'})_: **${daysLeft}** days left.\n  Auto renewal is ${row.autoRenew === 1 ? '**enabled**.' : '**disabled**.'}
- ${daysLeft < 14 && freeDomain && row.autoRenew ? 'Starting auto renewal.' : ''}\n`
+        message += `- **${domain.name}** _(${row.free ? 'free' : 'paid'})_: **${daysLeft}** days left.\n  Auto renewal is ${row.autoRenew === 1 ? '**enabled**.' : '**disabled**.'} ${daysLeft < 14 && row.free && row.autoRenew ? 'Starting auto renewal.' : ''}\n\n`
 
-        if (daysLeft < 14 && freeDomain && row.autoRenew) {
+        if (daysLeft < 14 && row.free && row.autoRenew) {
           await freenom.page.goto(domain.renewLink, { waitUntil: 'networkidle2' })
           await freenom.page.waitFor('.renewDomains')
           await freenom.page.evaluate(() => document.getElementsByTagName('option')[11].selected = true)
@@ -118,7 +121,7 @@ const freenom = {
         }
         if (i === domains.length)  await discord(message)
         i += 1
-      })
+      }))
     } catch (e) {
       console.error('[renew] Error', e)
       await freenom.close()

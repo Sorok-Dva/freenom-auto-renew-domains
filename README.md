@@ -11,6 +11,15 @@ This application will also auto renew you free domains when it's possible. (auto
 It is highly recommended using this app under a process manager like pm2, as it become a background process that will run on your server.
 If you don't have a dedicated server that is always on, consider using [Heroku](https://www.heroku.com/).
 
+## Warning
+Due to lack of accessible data on freenom and to avoid unwanted behavior, please be sure at the first start that there is no free domains renewable.
+
+You can take a look here [My Freenoms Domains](https://my.freenom.com/domains.php?a=renewals).
+
+If you have free domain that is renewable please renew it before starting this tool. In this way, 
+free domain won't be considered as paid domain and set auto renew to false by default while creating database for the first time.
+Of course, for the next launches of the tool, you don't mind about having free domains renewable, the tool will automatically renew it if the first start was execute as described before.
+
 ### Prerequisites
 
 - `node` >= 11
