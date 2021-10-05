@@ -33,9 +33,9 @@ const freenom = {
     try {
       freenom.browser = await puppeteer.launch(puppeteerOpts)
       freenom.page = await freenom.browser.newPage()
-      await freenom.page.setViewport({ width: 1900, height: 1000, deviceScaleFactor: 1 })
+      await freenom.page.setViewport({width: 1900, height: 1000, deviceScaleFactor: 1})
 
-      await freenom.page.goto(freenom.url, { waitUntil: 'networkidle2' })
+      await freenom.page.goto(freenom.url, {waitUntil: 'networkidle2'})
 
       const title = await freenom.page.title()
       console.log(title)
@@ -56,15 +56,15 @@ const freenom = {
   login: async () => {
     try {
       await freenom.page
-        .type('input[name="username"]', process.env.FREENOM_LOGIN, { delay: 10 })
+        .type('input[name="username"]', process.env.FREENOM_LOGIN, { delay: 35 })
         .then(async () => console.log('Username complete'))
-      await freenom.page.waitFor(500)
+      await freenom.page.waitForTimeout(500)
       await freenom.page
-        .type('input[name="password"]', process.env.FREENOM_PASS, { delay: 10 })
+        .type('input[name="password"]', process.env.FREENOM_PASS, { delay: 35 })
         .then(async () => console.log('Password complete'))
       await freenom.page.evaluate(() => document.getElementsByTagName('form')[0].submit())
+      await freenom.page.waitForSelector('.renewalContent')
       console.log('connected')
-      await freenom.page.waitFor('.renewalContent')
     } catch (e) {
       console.error('[login] Error', e)
       await freenom.close()
@@ -110,16 +110,16 @@ const freenom = {
         message += `- **${domain.name}** _(${row.free ? 'free' : 'paid'})_: **${daysLeft}** days left.\n  Auto renewal is ${row.autoRenew === 1 ? '**enabled**.' : '**disabled**.'} ${daysLeft < 14 && row.free && row.autoRenew ? 'Starting auto renewal.' : ''}\n\n`
 
         if (daysLeft < 14 && row.free && row.autoRenew) {
-          await freenom.page.goto(domain.renewLink, { waitUntil: 'networkidle2' })
-          await freenom.page.waitFor('.renewDomains')
+          await freenom.page.goto(domain.renewLink, {waitUntil: 'networkidle2'})
+          await freenom.page.waitForSelector('.renewDomains')
           await freenom.page.evaluate(() => document.getElementsByTagName('option')[11].selected = true)
           await freenom.page.evaluate(() => document.getElementsByTagName('form')[0].submit())
-          await freenom.page.waitFor('.completedOrder').catch(async () => {
+          await freenom.page.waitForSelector('.completedOrder').catch(async () => {
             message += `**[${domain.name}]** An error has occurred while trying to auto renew this domain`
           })
           message += `**[${domain.name}]** Auto renewal complete !`
         }
-        if (i === domains.length)  await discord(message)
+        if (i === domains.length) await discord(message)
         i += 1
       }))
     } catch (e) {

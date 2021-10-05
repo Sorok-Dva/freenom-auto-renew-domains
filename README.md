@@ -55,3 +55,15 @@ FREENOM_CRONJOB="0 9 * * 1"
 - **FREENOM_LOGIN**: Your email of your Freenom account
 - **FREENOM_PASS**: Your password of your Freenom account
 - **FREENOM_CRONJOB**: The cronjob rule on you want to schedule auto renew. By default, the cronjob rule is set at `09 AM every Monday`. *(More info on [Crontab.guru](https://crontab.guru/))*
+
+### Examples
+
+#### Listing domains with infos
+<p style="text-align: center; margin: 20px auto;">
+  <img src="/doc/list.png" />
+</p>
+
+#### Auto renewal
+<p style="text-align: center; margin: 20px auto;">
+  <img src="/doc/auto-renew.png" />
+</p>
