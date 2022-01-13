@@ -87,6 +87,7 @@ const freenom = {
         return domains
       })
 
+      const messages = []
       let message = ``
       let i = 1
       await Promise.all(domains.map(async domain => {
@@ -119,7 +120,22 @@ const freenom = {
           })
           message += `**[${domain.name}]** Auto renewal complete !`
         }
-        if (i === domains.length) await discord(message)
+        messages.push(message)
+        message = ''
+
+        if (i === domains.length) {
+          const message = messages.join().replace(/,-/g, '-')
+          console.log('message: ', message)
+          if (message.length <= 2000 && i < 8) await discord(message)
+          else {
+            await Promise.all(messages.map(async msg => {
+              setTimeout(async () => {
+                console.log('message length > 2000', msg)
+                await discord(msg)
+              }, 2000) // to avoid discord rate limited
+            }))
+          }
+        }
         i += 1
       }))
     } catch (e) {
