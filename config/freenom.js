@@ -128,11 +128,13 @@ const freenom = {
           console.log('message: ', message)
           if (message.length <= 2000 && i < 8) await discord(message)
           else {
+            let j = 0;
             await Promise.all(messages.map(async msg => {
+              j+=500;
               setTimeout(async () => {
                 console.log('message length > 2000', msg)
                 await discord(msg)
-              }, 2000) // to avoid discord rate limited
+              }, j) // to avoid discord rate limited
             }))
           }
         }
