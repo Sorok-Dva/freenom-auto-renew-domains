@@ -88,6 +88,7 @@ const freenom = {
       })
 
       let message = ``
+      let messages = []
       let i = 1
       await Promise.all(domains.map(async domain => {
         const id = domain.renewLink.replace('https://my.freenom.com/domains.php?a=renewdomain&domain=', '')
