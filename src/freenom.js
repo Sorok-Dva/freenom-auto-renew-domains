@@ -3,9 +3,12 @@ const puppeteer = require('puppeteer')
 const util = require('util')
 const discord = require('./connectors/discord')
 const sqlite3 = require('sqlite3').verbose()
+const fs = require('fs')
+
+const cookiesPath = 'data/cookies'
 
 const renewDomains = async (message) => {
-  await freenom.page.goto(domain.renewLink, {waitUntil: 'networkidle2'})
+  await freenom.page.goto(domain.renewLink, { waitUntil: 'networkidle2' })
   await freenom.page.waitForSelector('.renewDomains')
   await freenom.page.evaluate(() => document.getElementsByTagName('option')[11].selected = true)
   await freenom.page.evaluate(() => document.getElementsByTagName('form')[0].submit())
@@ -58,13 +61,34 @@ const freenom = {
       freenom.db.get = util.promisify(freenom.db.get)
       freenom.db.all = util.promisify(freenom.db.all)
 
-      await freenom.login()
+      const hasPreviousSession = await freenom.previousSession()
+      if (!hasPreviousSession) await freenom.login()
+
       await freenom.renewFreeDomains()
     } catch (e) {
       console.error('[INIT] Failed', e)
     } finally {
       await freenom.close()
     }
+  },
+  previousSession: async () => {
+    const previousSession = fs.existsSync(cookiesPath)
+    if (previousSession) {
+      const content = fs.readFileSync(cookiesPath)
+      const cookies = JSON.parse(content || '[]')
+      if (cookies.length > 0) {
+        for (let cookie of cookies) await CMC.page.setCookie(cookie)
+        console.log('Session has been loaded in the browser')
+        return true
+      }
+    }
+
+    return false
+  },
+  updateSession: async () => {
+    const cookiesObject = await CMC.page.cookies()
+    fs.writeFileSync(cookiesPath, JSON.stringify(cookiesObject))
+    console.log('Session has been saved to ' + cookiesPath)
   },
   login: async () => {
     try {
