@@ -1,12 +1,26 @@
-const puppeteerOpts = require('./puppeteer').options
+const puppeteerOpts = require('./config/puppeteer').options
 const puppeteer = require('puppeteer')
 const util = require('util')
-const discord = require('../connectors/discord')
+const discord = require('./connectors/discord')
 const sqlite3 = require('sqlite3').verbose()
+
+const renewDomains = async (message) => {
+  await freenom.page.goto(domain.renewLink, {waitUntil: 'networkidle2'})
+  await freenom.page.waitForSelector('.renewDomains')
+  await freenom.page.evaluate(() => document.getElementsByTagName('option')[11].selected = true)
+  await freenom.page.evaluate(() => document.getElementsByTagName('form')[0].submit())
+  await freenom.page.waitForSelector('.completedOrder').catch(async () => {
+    message += `**[${domain.name}]** An error has occurred while trying to auto renew this domain`
+  })
+  message += `**[${domain.name}]** Auto renewal complete !`
+
+  return message
+}
 
 const freenom = {
   browser: null,
   page: null,
+  logged: false,
   url: 'https://my.freenom.com/domains.php?a=renewals',
   db: new sqlite3.Database(`./${process.env.DB_NAME}.db`,
     sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
@@ -21,7 +35,7 @@ const freenom = {
         status text not null
       )`)
     }),
-  getDomain: async (name) => await freenom.db.get('SELECT * FROM freenom WHERE name = ?', [name]),
+  getDbDomain: async (name) => await freenom.db.get('SELECT * FROM freenom WHERE name = ?', [name]),
   close: async () => {
     if (!freenom.browser) return true
     await freenom.browser.close().then(async () => {
@@ -66,6 +80,7 @@ const freenom = {
         throw new Error(`Login Details Incorrect. Please check your .env file. (${e.message})`)
       })
       console.log('connected')
+      freenom.logged = true
     } catch (e) {
       console.error('[login]', e)
       await freenom.close()
@@ -99,28 +114,19 @@ const freenom = {
         // that's why the scrapper should be run a first time without any free domains renewables
         // (in this way the free domain state will be saved in db)
         const freeDomain = (daysLeft > 14 && domain.renewable === false)
-        let row = await freenom.getDomain(domain.name)
+        let row = await freenom.getDbDomain(domain.name)
 
         if (row === undefined) {
           await freenom.db.run(`INSERT INTO freenom
           (id, name, status, free, autoRenew) VALUES(?, ?, ?, ?, ?)`,
             [id, domain.name, domain.status, freeDomain, !!freeDomain],
           )
-          row = await freenom.getDomain(domain.name)
+          row = await freenom.getDbDomain(domain.name)
         }
 
         message += `- **${domain.name}** _(${row.free ? 'free' : 'paid'})_: **${daysLeft}** days left.\n  Auto renewal is ${row.autoRenew === 1 ? '**enabled**.' : '**disabled**.'} ${daysLeft < 14 && row.free && row.autoRenew ? 'Starting auto renewal.' : ''}\n\n`
 
-        if (daysLeft < 14 && row.free && row.autoRenew) {
-          await freenom.page.goto(domain.renewLink, {waitUntil: 'networkidle2'})
-          await freenom.page.waitForSelector('.renewDomains')
-          await freenom.page.evaluate(() => document.getElementsByTagName('option')[11].selected = true)
-          await freenom.page.evaluate(() => document.getElementsByTagName('form')[0].submit())
-          await freenom.page.waitForSelector('.completedOrder').catch(async () => {
-            message += `**[${domain.name}]** An error has occurred while trying to auto renew this domain`
-          })
-          message += `**[${domain.name}]** Auto renewal complete !`
-        }
+        if (daysLeft < 14 && row.free && row.autoRenew) message = await renewDomains()
         messages.push(message)
         message = ''
 
@@ -141,6 +147,20 @@ const freenom = {
         }
         i += 1
       }))
+    } catch (e) {
+      console.error('[renew] Error', e)
+      await freenom.close()
+    }
+  },
+  renew: async (id) => {
+    try {
+      let message = ``
+
+      freenom.page.goto(`https://my.freenom.com/domains.php?a=renewdomain&domain=${id}`, { waitUntil: 'networkidle2' })
+
+      message = await renewDomains()
+      await discord(message)
+      return message
     } catch (e) {
       console.error('[renew] Error', e)
       await freenom.close()
