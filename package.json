@@ -1,18 +1,18 @@
 {
   "name": "freenom-autorenew-domains",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A scraper built with puppeteer to renew free domains on Freenom",
   "author": "Сорок два",
   "private": true,
   "scripts": {
-    "start": "node ."
+    "start": "node src/app.js"
   },
   "dependencies": {
     "cron": "^1.8.2",
     "discord-bot-webhook": "^1.0.4",
     "dotenv": "^8.2.0",
     "fs": "0.0.1-security",
-    "puppeteer": "^10.2.0",
+    "puppeteer": "^10.4.0",
     "request": "^2.88.0",
     "sqlite3": "^5.0.0"
   },
