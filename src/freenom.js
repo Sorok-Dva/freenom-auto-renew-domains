@@ -3,11 +3,8 @@ const puppeteer = require('puppeteer')
 const util = require('util')
 const discord = require('./connectors/discord')
 const sqlite3 = require('sqlite3').verbose()
-const fs = require('fs')
 
-const cookiesPath = 'data/cookies'
-
-const renewDomains = async (message) => {
+const renewDomains = async (message, domain) => {
   await freenom.page.goto(domain.renewLink, { waitUntil: 'networkidle2' })
   await freenom.page.waitForSelector('.renewDomains')
   await freenom.page.evaluate(() => document.getElementsByTagName('option')[11].selected = true)
@@ -46,7 +43,7 @@ const freenom = {
       console.log(`Scrap finished for ${freenom.url}`)
     })
   },
-  init: async () => {
+  initJob: async () => {
     try {
       freenom.browser = await puppeteer.launch(puppeteerOpts)
       freenom.page = await freenom.browser.newPage()
@@ -57,38 +54,27 @@ const freenom = {
       const title = await freenom.page.title()
       console.log(title)
 
-      freenom.db.run = util.promisify(freenom.db.run)
-      freenom.db.get = util.promisify(freenom.db.get)
-      freenom.db.all = util.promisify(freenom.db.all)
-
-      const hasPreviousSession = await freenom.previousSession()
-      if (!hasPreviousSession) await freenom.login()
-
+      await freenom.login()
       await freenom.renewFreeDomains()
     } catch (e) {
-      console.error('[INIT] Failed', e)
+      console.error('[INIT_JOB] Failed', e)
     } finally {
       await freenom.close()
     }
   },
-  previousSession: async () => {
-    const previousSession = fs.existsSync(cookiesPath)
-    if (previousSession) {
-      const content = fs.readFileSync(cookiesPath)
-      const cookies = JSON.parse(content || '[]')
-      if (cookies.length > 0) {
-        for (let cookie of cookies) await CMC.page.setCookie(cookie)
-        console.log('Session has been loaded in the browser')
-        return true
-      }
-    }
+  initPage: async (url) => {
+    try {
+      if (!freenom.browser) freenom.browser = await puppeteer.launch(puppeteerOpts)
+      freenom.page = await freenom.browser.newPage()
+      await freenom.page.setViewport({ width: 1900, height: 1000, deviceScaleFactor: 1 })
+      await freenom.page.goto(url, { waitUntil: 'networkidle2' })
 
-    return false
-  },
-  updateSession: async () => {
-    const cookiesObject = await CMC.page.cookies()
-    fs.writeFileSync(cookiesPath, JSON.stringify(cookiesObject))
-    console.log('Session has been saved to ' + cookiesPath)
+      const title = await freenom.page.title()
+      console.log(title)
+
+    } catch (e) {
+      console.error('[INIT_PAGE] Failed', e)
+    }
   },
   login: async () => {
     try {
@@ -104,7 +90,6 @@ const freenom = {
         throw new Error(`Login Details Incorrect. Please check your .env file. (${e.message})`)
       })
       console.log('connected')
-      freenom.logged = true
     } catch (e) {
       console.error('[login]', e)
       await freenom.close()
@@ -150,13 +135,13 @@ const freenom = {
 
         message += `- **${domain.name}** _(${row.free ? 'free' : 'paid'})_: **${daysLeft}** days left.\n  Auto renewal is ${row.autoRenew === 1 ? '**enabled**.' : '**disabled**.'} ${daysLeft < 14 && row.free && row.autoRenew ? 'Starting auto renewal.' : ''}\n\n`
 
-        if (daysLeft < 14 && row.free && row.autoRenew) message = await renewDomains()
+        if (daysLeft < 14 && row.free && row.autoRenew) message = await renewDomains(message, domain)
         messages.push(message)
         message = ''
 
         if (i === domains.length) {
           const message = messages.join().replace(/,-/g, '-')
-          console.log('message: ', message)
+          // console.log('message: ', message)
           if (message.length <= 2000 && i < 8) await discord(message)
           else {
             let timer = 0
@@ -178,11 +163,9 @@ const freenom = {
   },
   renew: async (id) => {
     try {
-      let message = ``
-
       freenom.page.goto(`https://my.freenom.com/domains.php?a=renewdomain&domain=${id}`, { waitUntil: 'networkidle2' })
 
-      message = await renewDomains()
+      let message = await renewDomains()
       await discord(message)
       return message
     } catch (e) {
@@ -191,5 +174,9 @@ const freenom = {
     }
   },
 }
+
+freenom.db.run = util.promisify(freenom.db.run)
+freenom.db.get = util.promisify(freenom.db.get)
+freenom.db.all = util.promisify(freenom.db.all)
 
 module.exports = freenom

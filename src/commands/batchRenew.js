@@ -9,6 +9,7 @@ module.exports = {
   async execute(interaction) {
     interaction.reply('Retrieving domains...')
     if (Freenom.browser) await Freenom.close()
-    await Freenom.init()
+    await Freenom.initJob()
+    await interaction.editReply('Batch done.');
   }
 }
