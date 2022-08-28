@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  app:
+    container_name: freenom
+    init: true
+    image: freenom/auto-renew
+    build:
+      context: .
+      target: dev
+    command: npm run start
+    volumes:
+      - .:/build/
+      - dist:/build/dist
+      - node_modules:/build/node_modules
+    ports:
+      - "${PORT:-3042}:${PORT:-3042}"
+    networks:
+      - default
+      - localnet
+    env_file: .env
+
+networks:
+  localnet:
+
+volumes:
+  dist:
+  node_modules:

@@ -22,7 +22,7 @@ Of course, for the next launches of the tool, you don't mind about having free d
 
 ### Prerequisites
 
-- `node` >= 11
+- `node` >= 16
 - `npm`
 - `pm2`
 
