@@ -17,5 +17,9 @@
     "request": "^2.88.0",
     "sqlite3": "^5.0.0"
   },
-  "main": "app.js"
+  "main": "src/app.js",
+  "engines": {
+    "npm": ">=7.0.0",
+    "node": ">=16.0.0"
+  }
 }
