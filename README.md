@@ -22,7 +22,7 @@ Of course, for the next launches of the tool, you don't mind about having free d
 
 ### Prerequisites
 
-- `node` >= 11
+- `node` >= 16
 - `npm`
 - `pm2`
 
@@ -34,13 +34,26 @@ cp .env.sample .env
 pm2 start app.js --name "FreenomAutoRenewDomains"
 ```
 
+You can also start the application with docker :
+
+```shell
+docker compose up
+```
+or 
+```shell
+make start
+```
+
 ### Env file
 
 Before running for the first time, you need to fill your `.env` file with your own values.
 
+_(You can create the .env file with `make .env`)_
+
 ```dotenv
 DB_NAME=freenoms-domains
 CHROME_PATH=/usr/bin/chromium-browser
+PUPPETEER_HEADLESS=true
 DISCORD_WEBHOOK_ID=
 DISCORD_WEBHOOK_TOKEN=
 FREENOM_LOGIN=email
@@ -49,6 +62,7 @@ FREENOM_CRONJOB="0 9 * * 1"
 ```
 
 - **DB_NAME**: The name of the local sqlite3 db used to saved domain data and preferences (like auto renew)
+- **PUPPETEER_HEADLESS**: Allows you to show the browser or not
 - **CHROME_PATH**: The path to a chromium browser used by puppeteer
 - **DISCORD_WEBHOOK_ID**: The discord webhook ID used to send domains status and auto renew information on your discord server *(More info on [Discord Support](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks))*
 - **DISCORD_WEBHOOK_TOKEN**: The discord webhook TOKEN used to send domains status and auto renew information on your discord server
