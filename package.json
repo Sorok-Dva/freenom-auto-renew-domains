@@ -5,7 +5,8 @@
   "author": "Сорок два",
   "private": true,
   "scripts": {
-    "start": "node src/app.js"
+    "start": "node src/app.js",
+    "build": "node src/app.js"
   },
   "dependencies": {
     "cron": "^1.8.2",
