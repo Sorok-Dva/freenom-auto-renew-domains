@@ -5,7 +5,7 @@
 # Freenom Auto Renew Domains
 
 ## Description
-This application is a scraper built with puppeteer that will send discord message with webhook to list your domains, their status and how many days it left before it needs a renew.
+This application is a scraper built with puppeteer combined to a discord bot that list your domains, their status and how many days it left before it needs a renew.
 This application will also auto renew you free domains when it's possible. (auto renewal is deactivated by default for paid domains, but in a future update you'll be able to manage auto renew with discord commands)
 
 It is highly recommended using this app under a process manager like pm2, as it become a background process that will run on your server.
@@ -30,8 +30,8 @@ Of course, for the next launches of the tool, you don't mind about having free d
 
 ```
 npm install
-cp .env.sample .env
-pm2 start app.js --name "FreenomAutoRenewDomains"
+make .env
+pm2 start npm --name FreenomAutoRenewDomains -- run start
 ```
 
 ### Env file
@@ -40,18 +40,28 @@ Before running for the first time, you need to fill your `.env` file with your o
 
 ```dotenv
 DB_NAME=freenoms-domains
-CHROME_PATH=/usr/bin/chromium-browser
-DISCORD_WEBHOOK_ID=
-DISCORD_WEBHOOK_TOKEN=
+PUPPETEER_HEADLESS=true
+
+DISCORD_TOKEN=
+DISCORD_GUILD_ID=
+DISCORD_CHANNEL_ID=
+
 FREENOM_LOGIN=email
 FREENOM_PASS=password
 FREENOM_CRONJOB="0 9 * * 1"
+
+# Docker exec path
+CHROME_PATH=google-chrome-stable
+# Linux
+CHROME_PATH=/usr/local/bin/chromium
 ```
 
 - **DB_NAME**: The name of the local sqlite3 db used to saved domain data and preferences (like auto renew)
+- **PUPPETEER_HEADLESS**: Display the chromium browser or not
 - **CHROME_PATH**: The path to a chromium browser used by puppeteer
-- **DISCORD_WEBHOOK_ID**: The discord webhook ID used to send domains status and auto renew information on your discord server *(More info on [Discord Support](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks))*
-- **DISCORD_WEBHOOK_TOKEN**: The discord webhook TOKEN used to send domains status and auto renew information on your discord server
+- **DISCORD_TOKEN**: The discord bot token *(More info on [Discord.js Guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot))*
+- **DISCORD_GUILD_ID**: The discord server  *(see [Discord Docs - How to retrieve ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-))*
+- **DISCORD_CHANNEL_ID**: The discord channel id *(see [Discord Docs - How to retrieve ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-))*
 - **FREENOM_LOGIN**: Your email of your Freenom account
 - **FREENOM_PASS**: Your password of your Freenom account
 - **FREENOM_CRONJOB**: The cronjob rule on you want to schedule auto renew. By default, the cronjob rule is set at `09 AM every Monday`. *(More info on [Crontab.guru](https://crontab.guru/))*
