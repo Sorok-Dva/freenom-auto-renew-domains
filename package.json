@@ -10,7 +10,7 @@
     "build:all": "tsc -d",
     "develop": "tsc-watch --noClear --onSuccess \"node ./dist/index.js\"",
     "describe": "npm-scripts-info",
-    "dev": "ts-node-esm src/main.ts",
+    "dev": "ts-node-esm src/index.ts",
     "start": "node build/index.js",
     "release": "standard-version -s",
     "test": "run-p test:**",

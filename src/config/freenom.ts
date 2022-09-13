@@ -1,7 +1,6 @@
 import type { Browser, Page } from 'puppeteer'
-import { EmbedBuilder } from 'discord.js'
+import { CommandInteraction, EmbedBuilder, GuildManager } from 'discord.js'
 import { Client } from 'discordx'
-import * as util from 'util'
 import puppeteer from 'puppeteer'
 import { options as puppeteerOpts } from './puppeteer.js'
 import database from '../database.js'
@@ -18,7 +17,7 @@ const close = async () => {
   })
 }
 
-const init = async (bot: Client) => {
+const init = async (guilds: GuildManager) => {
   try {
     browser = await puppeteer.launch(puppeteerOpts)
     page = await browser.newPage()
@@ -30,7 +29,7 @@ const init = async (bot: Client) => {
     console.log(title)
     
     await login()
-    await renewFreeDomains(bot)
+    await renewFreeDomains(guilds)
   } catch (e) {
     console.error('[INIT] Failed', e)
   } finally {
@@ -61,10 +60,10 @@ const login = async () => {
   }
 }
 
-const renewFreeDomains = async (bot: Client) => {
+const renewFreeDomains = async (guilds: GuildManager) => {
   try {
     if (!page) return
-    const guild = await bot.guilds.fetch(String(process.env.DISCORD_GUILD_ID))
+    const guild = await guilds.fetch(String(process.env.DISCORD_GUILD_ID))
     const channel = await guild.channels.fetch(String(process.env.DISCORD_CHANNEL_ID))
   
     if(!channel) throw new Error('Channel not found. Please check guild & channel id')
