@@ -1,6 +1,6 @@
 {
   "name": "freenom-autorenew-domains",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A scraper built with puppeteer to renew free domains on Freenom",
   "author": "Сорок два <sorokdva.developer@gmail.com>",
   "private": false,
