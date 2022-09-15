@@ -7,7 +7,7 @@ PUBLISH_FLAGS = publish --access public
 
 PACKAGE_LOCK = package-lock.json
 SRC = src
-DIST = build
+DIST = dist
 ENVFILE = .env
 MODULES = node_modules node_modules/.bin
 

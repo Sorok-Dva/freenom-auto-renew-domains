@@ -71,6 +71,6 @@ gen
 # SQLite 3 db
 *.db
 
-/build/
+/dist/
 */*.js.map
 */*.js

@@ -3,18 +3,24 @@
   "version": "1.0.2",
   "description": "A scraper built with puppeteer to renew free domains on Freenom",
   "author": "Сорок два <sorokdva.developer@gmail.com>",
-  "private": true,
+  "private": false,
+  "license": "MIT",
   "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "run-p build:*",
     "build:all": "tsc -d",
     "describe": "npm-scripts-info",
-    "dev": "ts-node-esm src/index.ts",
-    "start": "node build/index.js",
+    "dev": "ts-node-esm src/main.ts",
     "release": "standard-version -s",
+    "start": "node dist/index.js",
     "test": "run-p test:**",
     "test:lint": "eslint 'src/**/*.ts' --fix",
-    "vulnerabilities": "snyk monitor"
+    "vulnerabilities": "snyk monitor",
+    "watch": "nodemon --exec ts-node-esm src/main.ts"
   },
   "lint-staged": {
     "src/**/*.ts": [
@@ -56,7 +62,6 @@
   "_moduleAliases": {
     "@": "dist"
   },
-  "main": "dist/index.js",
   "engines": {
     "npm": ">=7.0.0",
     "node": ">=16.0.0"

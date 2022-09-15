@@ -1,33 +1,39 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "module": "esnext",
     "strict": true,
-    "moduleResolution": "Node",
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "dist/@types",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
     "allowSyntheticDefaultImports": true,
-
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-
-    "skipLibCheck": false,
     "forceConsistentCasingInFileNames": true,
-
-    "outDir": "build",
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "outDir": "dist",
     "rootDir": "src",
-    // "paths": {
-    //   "@/*": ["src/*"]
-    // },
-    // NOTE: `typeRoots` are only used to resolve /// <reference types=".." /> directives
-    // see: https://github.com/Microsoft/TypeScript/issues/12222#issuecomment-260417733
     "typeRoots": [
-      "@types",
       "node_modules/@types"
     ],
   },
   "include": [
     "@types",
-    "src"
+    "src",
   ],
-  "exclude": ["build", "node_modules"]
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts"
+  ],
+  "ts-node": {
+    "files": true
+  }
 }
