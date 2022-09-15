@@ -41,7 +41,7 @@ const run = async () => {
     await run()
     new CronJob(String(process.env.FREENOM_CRONJOB), async () => {
       if (browser) await close()
-      await init(bot.guilds)
+      await init(bot.guilds, 'renew')
     }).start()
   } catch (e) {
     console.log('Error while starting Freenom Bot', e)

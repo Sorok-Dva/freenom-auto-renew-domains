@@ -11,7 +11,7 @@ export class BatchRenew {
   async renew(interaction: CommandInteraction): Promise<void> {
     await interaction.reply('Retrieving domains...')
     if (browser) await close()
-    await init(interaction.client.guilds)
-    await interaction.editReply('Batch done.');
+    await init(interaction.client.guilds, 'renew')
+    await interaction.editReply('Batch done.')
   }
 }

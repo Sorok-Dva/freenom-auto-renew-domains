@@ -7,7 +7,7 @@ PUBLISH_FLAGS = publish --access public
 
 PACKAGE_LOCK = package-lock.json
 SRC = src
-DIST = dist
+DIST = build
 ENVFILE = .env
 MODULES = node_modules node_modules/.bin
 
@@ -54,6 +54,7 @@ build: $(DIST)
 $(DIST): $(MODULES) $(SRC_FILES)
 	$(PM) run build
 	@touch $(DIST)
+	@cp -r src/db $(DIST)
 
 .PHONY: publish
 publish:

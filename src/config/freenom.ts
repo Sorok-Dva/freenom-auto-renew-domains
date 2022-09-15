@@ -1,13 +1,12 @@
 import type { Browser, Page } from 'puppeteer'
-import { CommandInteraction, EmbedBuilder, GuildManager } from 'discord.js'
-import { Client } from 'discordx'
+import { Channel, EmbedBuilder, GuildManager } from 'discord.js'
 import puppeteer from 'puppeteer'
 import { options as puppeteerOpts } from './puppeteer.js'
 import database from '../database.js'
 
 let browser: Browser | null,
   page: Page | null,
-  url = 'https://my.freenom.com/domains.php?a=renewals'
+  url: string
 
 const close = async () => {
   if (!browser) return true
@@ -17,19 +16,40 @@ const close = async () => {
   })
 }
 
-const init = async (guilds: GuildManager) => {
+const setUrl = (type: 'renew' | 'register') => {
+  switch(type) {
+    case 'renew':
+      url = 'https://my.freenom.com/domains.php?a=renewals'
+      break
+    case 'register':
+      url = 'https://my.freenom.com/domains.php'
+      break
+    default: url = 'https://my.freenom.com/domains.php?a=renewals'
+  }
+}
+
+const init = async (
+  guilds: GuildManager,
+  type: 'renew' | 'register',
+  args?: { domain: string },
+) => {
   try {
     browser = await puppeteer.launch(puppeteerOpts)
     page = await browser.newPage()
     await page.setViewport({ width: 1900, height: 1000, deviceScaleFactor: 1 })
-    
-    await page.goto(url, { waitUntil: 'networkidle2' })
+    await page.goto('https://my.freenom.com/clientarea.php', { waitUntil: 'networkidle2' })
     
     const title = await page.title()
     console.log(title)
-    
+  
+    const guild = await guilds.fetch(String(process.env.DISCORD_GUILD_ID))
+    const channel = await guild.channels.fetch(String(process.env.DISCORD_CHANNEL_ID))
+    if(!channel) throw new Error('Channel not found. Please check guild & channel id')
+  
+    setUrl(type)
     await login()
-    await renewFreeDomains(guilds)
+    if (type === 'renew') await renewFreeDomains(channel)
+    if (type === 'register') await registerDomain(channel, args!.domain)
   } catch (e) {
     console.error('[INIT] Failed', e)
   } finally {
@@ -50,7 +70,7 @@ const login = async () => {
       .type('input[name="password"]', String(process.env.FREENOM_PASS), { delay: 35 })
       .then(async () => console.log('Password complete'))
     await page.evaluate(() => document.getElementsByTagName('form')[0].submit())
-    await page.waitForSelector('.renewalContent').catch((e: Error) => {
+    await page.waitForXPath('//a[contains(text(), "Logout")]').catch((e: Error) => {
       throw new Error(`Login Details Incorrect. Please check your .env file. (${e.message})`)
     })
     console.log('connected')
@@ -60,14 +80,11 @@ const login = async () => {
   }
 }
 
-const renewFreeDomains = async (guilds: GuildManager) => {
+const renewFreeDomains = async (channel: Channel) => {
   try {
     if (!page) return
-    const guild = await guilds.fetch(String(process.env.DISCORD_GUILD_ID))
-    const channel = await guild.channels.fetch(String(process.env.DISCORD_CHANNEL_ID))
+    await page.goto(url, { waitUntil: 'networkidle2' })
   
-    if(!channel) throw new Error('Channel not found. Please check guild & channel id')
-    
     const domains = await page.evaluate(() => {
       let domains: {
         name: string
@@ -157,6 +174,43 @@ const renewFreeDomains = async (guilds: GuildManager) => {
     }))
   } catch (e) {
     console.error('[renew] Error', e)
+    await close()
+  }
+}
+
+const registerDomain = async (
+  channel: Channel,
+  domain: string,
+) => {
+  try {
+    if (!page) return
+    const messageEmbed = new EmbedBuilder()
+      .setTitle('Register a new freenom domain')
+      .setColor(5763719)
+    await page.goto(url, { waitUntil: 'networkidle2' })
+    await page
+      .type('input[name="domainname"]', domain, { delay: 35 })
+      .then(async () => console.log('Domain complete'))
+    await page.keyboard.press('Enter')
+    await page.waitForSelector('.selectedDomains', {
+      visible: true,
+    })
+    const hasError = await page.evaluate(() =>
+        // @ts-ignore
+      document.getElementsByClassName('alert')[0].style.display !== 'none'
+    )
+    const hasSuccess = await page.evaluate(() =>
+      // @ts-ignore
+      document.getElementsByClassName('succes')[0].style.display !== 'none'
+    )
+    
+    console.log(hasError, hasSuccess)
+    messageEmbed.addFields({ name: 'Result', value: hasSuccess ? 'Available' : 'Not available' })
+    if(channel?.isTextBased()){
+      channel.send({ embeds: [messageEmbed] })
+    }
+  } catch (e) {
+    console.error('[register] Error', e)
     await close()
   }
 }
