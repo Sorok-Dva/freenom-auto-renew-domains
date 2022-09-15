@@ -70,3 +70,7 @@ gen
 
 # SQLite 3 db
 *.db
+
+/dist/
+*/*.js.map
+*/*.js

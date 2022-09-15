@@ -2,21 +2,66 @@
   "name": "freenom-autorenew-domains",
   "version": "1.0.2",
   "description": "A scraper built with puppeteer to renew free domains on Freenom",
-  "author": "Сорок два",
-  "private": true,
+  "author": "Сорок два <sorokdva.developer@gmail.com>",
+  "private": false,
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "files": [
+    "build"
+  ],
   "scripts": {
-    "start": "node src/app.js"
+    "build": "run-p build:*",
+    "build:all": "tsc -d",
+    "describe": "npm-scripts-info",
+    "dev": "ts-node-esm src/main.ts",
+    "release": "standard-version -s",
+    "start": "node dist/index.js",
+    "test": "run-p test:**",
+    "test:lint": "eslint 'src/**/*.ts' --fix",
+    "vulnerabilities": "snyk monitor",
+    "watch": "nodemon --exec ts-node-esm src/main.ts"
+  },
+  "lint-staged": {
+    "src/**/*.ts": [
+      "eslint"
+    ]
   },
   "dependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^18.7.13",
+    "@discordx/importer": "^1.1.10",
+    "@discordx/pagination": "^3.0.0",
+    "discord.js": "^14.3.0",
+    "discordx": "^11.1.12",
+    "dotenv": "^16.0.2",
     "cron": "^1.8.2",
     "discord-bot-webhook": "^1.0.4",
-    "dotenv": "^8.2.0",
     "fs": "0.0.1-security",
     "puppeteer": "^10.4.0",
+    "reflect-metadata": "^0.1.13",
     "request": "^2.88.0",
     "sqlite3": "^5.0.0"
   },
-  "main": "src/app.js",
+  "devDependencies": {
+    "@types/node": "^18.7.14",
+    "@types/cron": "^1.7.2",
+    "@types/puppeteer": "^5.4.6",
+    "@types/sqlite3": "^3.1.8",
+    "eslint": "^7.28.0",
+    "eslint-config-recommended": "^4.1.0",
+    "eslint-plugin-mocha": "^10.1.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "^2.7.1",
+    "ts-loader": "^9.3.1",
+    "ts-node": "^10.9.1",
+    "tsc-watch": "^5.0.3",
+    "tsconfig-paths": "^4.1.0",
+    "typescript": "^4.8.2"
+  },
+  "_moduleAliases": {
+    "@": "dist"
+  },
   "engines": {
     "npm": ">=7.0.0",
     "node": ">=16.0.0"

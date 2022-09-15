@@ -11,10 +11,7 @@ services:
     command: npm run start
     volumes:
       - .:/build/
-      - dist:/build/dist
       - node_modules:/build/node_modules
-    ports:
-      - "${PORT:-3042}:${PORT:-3042}"
     networks:
       - default
       - localnet
@@ -24,5 +21,5 @@ networks:
   localnet:
 
 volumes:
-  dist:
+  build:
   node_modules:

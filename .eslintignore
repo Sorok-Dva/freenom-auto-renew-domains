@@ -1,0 +1,9 @@
+# Exclude All
+**
+node_modules/
+
+# Explicit includes
+!@types/
+!@types/**
+!src/
+!src/**

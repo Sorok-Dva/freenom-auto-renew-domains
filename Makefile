@@ -54,6 +54,7 @@ build: $(DIST)
 $(DIST): $(MODULES) $(SRC_FILES)
 	$(PM) run build
 	@touch $(DIST)
+	@cp -r src/db $(DIST)
 
 .PHONY: publish
 publish:
