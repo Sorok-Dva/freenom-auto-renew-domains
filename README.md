@@ -42,7 +42,7 @@ Before running for the first time, you need to fill your `.env` file with your o
 DB_NAME=freenoms-domains
 PUPPETEER_HEADLESS=true
 
-DISCORD_TOKEN=
+DISCORD_BOT_TOKEN=
 DISCORD_GUILD_ID=
 DISCORD_CHANNEL_ID=
 
@@ -59,7 +59,7 @@ CHROME_PATH=/usr/local/bin/chromium
 - **DB_NAME**: The name of the local sqlite3 db used to saved domain data and preferences (like auto renew)
 - **PUPPETEER_HEADLESS**: Display the chromium browser or not
 - **CHROME_PATH**: The path to a chromium browser used by puppeteer
-- **DISCORD_TOKEN**: The discord bot token *(More info on [Discord.js Guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot))*
+- **DISCORD_BOT_TOKEN**: The discord bot token *(More info on [Discord.js Guide](https://discordjs.guide/preparations/setting-up-a-bot-application.html#creating-your-bot))*
 - **DISCORD_GUILD_ID**: The discord server  *(see [Discord Docs - How to retrieve ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-))*
 - **DISCORD_CHANNEL_ID**: The discord channel id *(see [Discord Docs - How to retrieve ID](https://support.discord.com/hc/en-us/articles/206346498-Where-can-I-find-my-User-Server-Message-ID-))*
 - **FREENOM_LOGIN**: Your email of your Freenom account

@@ -32,7 +32,7 @@ bot.on('messageCreate', async (message: Message) => {
 const run = async () => {
   await importx(dirname(import.meta.url) + '/{events,commands}/**/*.{ts,js}')
   
-  if (!process.env.DISCORD_BOT_TOKEN) throw Error('Could not find BOT_TOKEN in your environment')
+  if (!process.env.DISCORD_BOT_TOKEN) throw Error('Could not find DISCORD_BOT_TOKEN in your environment')
   await bot.login(process.env.DISCORD_BOT_TOKEN)
 }
 
