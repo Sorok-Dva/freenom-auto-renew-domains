@@ -12,10 +12,10 @@ ENVFILE = .env
 MODULES = node_modules node_modules/.bin
 
 DOCKER = docker
-COMPOSE ?= docker compose
+COMPOSE ?= docker-compose
 COMPOSE_FLAGS = --rm ${COMPOSE_SERVICE}
 COMPOSE_SERVICE := app
-RUN_IN_CONTAINER = docker compose run --rm $(COMPOSE_SERVICE)
+RUN_IN_CONTAINER = docker-compose run --rm $(COMPOSE_SERVICE)
 
 PM ?= npm
 RM ?= rm
