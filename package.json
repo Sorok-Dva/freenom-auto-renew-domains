@@ -30,7 +30,7 @@
   "dependencies": {
     "@types/dotenv": "^6.1.1",
     "@types/node": "^18.7.13",
-    "@discordx/importer": "^1.1.10",
+    "@discordx/importer": "^1.2.0",
     "@discordx/pagination": "^3.0.0",
     "discord.js": "^14.3.0",
     "discordx": "^11.1.12",
@@ -38,7 +38,7 @@
     "cron": "^1.8.2",
     "discord-bot-webhook": "^1.0.4",
     "fs": "0.0.1-security",
-    "puppeteer": "^10.4.0",
+    "puppeteer": "^18.2.0",
     "reflect-metadata": "^0.1.13",
     "request": "^2.88.0",
     "sqlite3": "^5.1.5"
