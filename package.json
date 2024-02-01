@@ -32,7 +32,7 @@
     "@types/node": "^18.7.13",
     "@discordx/importer": "^1.2.0",
     "@discordx/pagination": "^3.0.0",
-    "discord.js": "^14.3.0",
+    "discord.js": "^14.8.0",
     "discordx": "^11.1.12",
     "dotenv": "^16.0.2",
     "cron": "^1.8.2",
