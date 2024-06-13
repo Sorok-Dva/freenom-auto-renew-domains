@@ -1,5 +1,4 @@
 import { PuppeteerNodeLaunchOptions } from 'puppeteer'
-
 const options: PuppeteerNodeLaunchOptions = {
   headless: false,
   executablePath: process.env.CHROME_PATH,

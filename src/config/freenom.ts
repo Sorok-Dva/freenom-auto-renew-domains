@@ -57,7 +57,7 @@ const init = async (
   }
 }
 
-const getDomain = async (name: string) => await database.get('SELECT * FROM freenom WHERE name = ?', [name])
+const getDomain = async (name: string) => await database.getAsync('SELECT * FROM freenom WHERE name = ?', [name])
 
 const login = async () => {
   try {
@@ -95,16 +95,11 @@ const renewFreeDomains = async (channel: Channel) => {
       }[] = []
       for (let i = 0; i < document.getElementsByTagName('tbody')[0].children.length; i++) {
         domains.push({
-          /* @ts-ignore */
-          name: document.getElementsByTagName('tbody')[0].children[i].childNodes[0].innerText,
-          /* @ts-ignore */
-          status: document.getElementsByTagName('tbody')[0].children[i].childNodes[1].innerText,
-          /* @ts-ignore */
-          expires: document.getElementsByTagName('tbody')[0].children[i].childNodes[2].innerText,
-          /* @ts-ignore */
-          renewable: document.getElementsByTagName('tbody')[0].children[i].childNodes[3].innerText === 'Renewable',
-          /* @ts-ignore */
-          renewLink: document.getElementsByTagName('tbody')[0].children[i].childNodes[5].childNodes[0].href,
+          name: (document.getElementsByTagName('tbody')[0].children[i].childNodes[0] as HTMLElement).innerText,
+          status: (document.getElementsByTagName('tbody')[0].children[i].childNodes[1] as HTMLElement).innerText,
+          expires: (document.getElementsByTagName('tbody')[0].children[i].childNodes[2] as HTMLElement).innerText,
+          renewable: (document.getElementsByTagName('tbody')[0].children[i].childNodes[3] as HTMLElement).innerText === 'Renewable',
+          renewLink: (document.getElementsByTagName('tbody')[0].children[i].childNodes[5].childNodes[0] as HTMLLinkElement).href,
         })
       }
       
@@ -129,7 +124,7 @@ const renewFreeDomains = async (channel: Channel) => {
       let row: any = await getDomain(domain.name)
       
       if (row === undefined) {
-        await database.run(`INSERT INTO freenom
+        await database.runAsync(`INSERT INTO freenom
           (id, name, status, free, autoRenew) VALUES(?, ?, ?, ?, ?)`,
           [id, domain.name, domain.status, freeDomain, freeDomain],
         )
@@ -196,12 +191,10 @@ const registerDomain = async (
       visible: true,
     })
     const hasError = await page.evaluate(() =>
-        // @ts-ignore
-      document.getElementsByClassName('alert')[0].style.display !== 'none'
+      (document.getElementsByClassName('alert')[0] as HTMLElement).style.display !== 'none'
     )
     const hasSuccess = await page.evaluate(() =>
-      // @ts-ignore
-      document.getElementsByClassName('succes')[0].style.display !== 'none'
+      (document.getElementsByClassName('succes')[0] as HTMLElement).style.display !== 'none'
     )
     
     console.log(hasError, hasSuccess)
